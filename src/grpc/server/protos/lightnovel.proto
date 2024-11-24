@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package com.zen.grpc.nodejs.lightnovel.service;
+
+service LightnovelService {
+  rpc register (Empty) returns (BaseResponse) {}
+}
+
+message Empty {}
+
+message BaseResponse {
+  int32 status = 1;
+  string message = 2;
+  Empty data = 3;
+}
