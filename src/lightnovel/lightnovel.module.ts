@@ -1,17 +1,13 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { LightnovelController } from './lightnovel.controller';
 import { LightnovelService } from './lightnovel.service';
 import { LightnovelDao } from './lightnovel.dao';
-import { Lightnovel, LightnovelSchema } from './schema/lightnovel.schema';
+import { Lightnovel } from './entity/lightnovel.entity';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: Lightnovel.name, schema: LightnovelSchema },
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([Lightnovel])],
   controllers: [LightnovelController],
   providers: [LightnovelService, LightnovelDao],
   exports: [LightnovelDao],

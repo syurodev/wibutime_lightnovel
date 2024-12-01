@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "genarate": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./ --ts_proto_opt=addGrpcMetadata=true --ts_proto_opt=nestJs=true --ts_proto_opt=snakeToCamel=false ./src/v1/grpc/client/protos/user.proto"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.12.2",
@@ -26,16 +27,18 @@
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/microservices": "^10.4.8",
-    "@nestjs/mongoose": "^10.1.0",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/platform-fastify": "^10.4.8",
+    "@nestjs/typeorm": "^10.0.2",
     "@syurodev/nestjs-common": "^0.0.10",
     "@syurodev/ts-common": "^0.0.7",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "moment-timezone": "^0.5.46",
+    "pg": "^8.13.1",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "typeorm": "^0.3.20"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -57,6 +60,7 @@
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
+    "ts-proto": "^2.4.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.3"
   },

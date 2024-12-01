@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { VolumeController } from './volume.controller';
 import { VolumeService } from './volume.service';
 import { VolumeDao } from './volume.dao';
-import { Volume, VolumeSchema } from './schema/lightnovel.schema';
+import { Volume } from './entity/volume.entity';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Volume.name, schema: VolumeSchema }]),
-  ],
+  imports: [TypeOrmModule.forFeature([Volume])],
   controllers: [VolumeController],
   providers: [VolumeService, VolumeDao],
   exports: [VolumeDao],

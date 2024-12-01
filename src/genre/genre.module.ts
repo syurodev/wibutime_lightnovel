@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { GenreController } from './genre.controller';
 import { GenreService } from './genre.service';
 import { GenreDao } from './genre.dao';
-import { Genre, GenreSchema } from './schema/genre.schema';
+import { Genre } from './entity/genre.entity';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Genre.name, schema: GenreSchema }]),
-  ],
+  imports: [TypeOrmModule.forFeature([Genre])],
   controllers: [GenreController],
   providers: [GenreService, GenreDao],
   exports: [GenreDao],
