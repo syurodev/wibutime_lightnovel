@@ -1,41 +1,57 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { LightnovelRepository } from '../../data/repositories/lightnovel.repository';
-import { LightNovelModel } from './model/lightnovel-detail.model';
 import { UserGRPCService } from 'src/grpc/client/service/user.service';
-import { BasicUserResponse } from 'src/grpc/client/protos/interfaces/user';
-import { LightNovelDetailResponse } from './response/lightnovel-detail.response';
+import { Lightnovel } from '../../data/entities/lightnovel.entity';
+import { FindOptionsWhere } from 'typeorm';
 
 @Injectable()
 export class LightnovelService {
     constructor(
-        private readonly lightnovelDao: LightnovelRepository,
+        private readonly lightnovelRepository: LightnovelRepository,
         private readonly userGRPCService: UserGRPCService,
     ) {}
 
-    async getDetail(id: number): Promise<LightNovelDetailResponse> {
-        try {
-            const lightNovelModel: LightNovelModel =
-                await this.lightnovelDao.getDetail(id);
+    async findOne(option: FindOptionsWhere<Lightnovel>): Promise<Lightnovel> {
+        return await this.lightnovelRepository.findOne(option);
+    }
 
-            const userBasic: BasicUserResponse =
-                await this.userGRPCService.getBasic({
-                    id: lightNovelModel.user_id,
-                });
+    async getSummary(id: number) {
+        return await this.lightnovelRepository.getSummary(id);
+    }
 
-            if (userBasic.status !== HttpStatus.OK) {
-                throw new HttpException(
-                    userBasic.message,
-                    HttpStatus.BAD_REQUEST,
-                );
-            }
+    async getDetail(id: number) {
+        return await this.lightnovelRepository.getDetail(id);
+    }
 
-            return new LightNovelDetailResponse(
-                lightNovelModel,
-                userBasic.data,
-            );
-        } catch (error) {
-            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-        }
+    async getSummaryWithPagination({
+        user_id,
+        author_id,
+        artist_id,
+        status,
+        type,
+        key_search,
+        page,
+        limit,
+    }: {
+        user_id: number;
+        author_id: number;
+        artist_id: number;
+        status: number;
+        type: number;
+        key_search: string;
+        page: number;
+        limit: number;
+    }) {
+        return await this.lightnovelRepository.getSummaryWithPagination({
+            user_id,
+            author_id,
+            artist_id,
+            status,
+            type,
+            key_search,
+            page,
+            limit,
+        });
     }
 }

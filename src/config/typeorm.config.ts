@@ -12,7 +12,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
             password: process.env.CONFIG_PG_PASSWORD_NOVEL,
             database: process.env.CONFIG_PG_DB_NAME_NOVEL,
             entities: ['dist/**/*.entity{.ts,.js}'],
-            synchronize: true,
+            synchronize: false,
             logging: false,
         };
     }

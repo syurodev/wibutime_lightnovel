@@ -1,78 +1,97 @@
-import { BasicUserDataResponse } from 'src/grpc/client/protos/interfaces/user';
-import {
-    AuthorOrArtist,
-    Category,
-    LightNovelModel,
-    Summary,
-    Volume,
-} from '../model/lightnovel-detail.model';
-import { TIME_FORMAT, TimeUtil } from '@syurodev/ts-common';
+import { AuthorOrArtist } from '../model/lightnovel-detail.model';
+import { EditorContent } from '../../../common/interfaces/editor';
+import { AuthorResponse } from '../../author/response/response';
+import { ArtistResponse } from '../../artist/response/response';
+import { GenreResponse } from '../../genre/response/response';
+import { VolumeSummaryResponse } from '../../volume/response/volume-summary.response';
 
-export class LightNovelDetailResponse {
+type RawData = {
     id: number;
     title: string;
-    user: BasicUserDataResponse;
-    resource_id: string;
     cover_image_url: string;
-    summary: Summary[];
+    summary: EditorContent[];
+    alternative_names: string[];
+    status: number;
+    type: number;
+    author_id: number | null;
+    author_name: string | null;
+    artist_id: number | null;
+    artist_name: string | null;
+    genre_ids: number[];
+    genre_names: string[];
+    volumes: {
+        id: number;
+        title: string;
+        release_date: string | null;
+        volume_number: number;
+        cover_image_url: string;
+    }[];
+    word_count: string;
+};
+
+export class BaseLightNovelResponse {
+    id: number;
+    title: string;
+    cover_image_url: string;
+    summary: EditorContent[];
     author: AuthorOrArtist;
     artist: AuthorOrArtist;
     status: number;
-    categories: Category[];
-    type: string;
+    genres: GenreResponse[];
+    type: number;
     alternative_names: string[];
     word_count: number;
-    volumes: Volume[];
+    volumes: VolumeSummaryResponse[];
 
-    constructor(lightnovel: LightNovelModel, user: BasicUserDataResponse) {
-        this.id = lightnovel.id;
-        this.title = lightnovel.title;
-        this.resource_id = lightnovel.resource_id;
-        this.user = user;
-        this.cover_image_url = lightnovel.cover_image_url;
-        this.summary = lightnovel.summary.map((s: any) => ({
-            id: s.id,
-            type: s.type,
-            children: s.children.map((c: any) => ({
-                text: c?.text ?? '',
-                italic: c?.italic ?? false,
-                bold: c?.bold ?? false,
-            })),
-        }));
-        this.author = lightnovel?.author
-            ? { id: lightnovel.author.id, name: lightnovel.author.name }
-            : null;
-        this.artist = lightnovel?.artist
-            ? { id: lightnovel.artist.id, name: lightnovel.artist.name }
-            : null;
-        this.status = lightnovel.status;
-        this.categories = lightnovel.categories.map((c: any) => ({
-            id: c.id,
-            name: c.name,
-        }));
-        // this.type = lightnovel.type;
-        this.type = 'Máy dịch';
-        this.alternative_names = lightnovel.alternative_names;
-        this.word_count = lightnovel.word_count;
-        this.volumes = lightnovel.volumes.map((v: any) => ({
-            id: v.id,
-            title: v.title,
-            volume_number: v.volume_number,
-            synopsis: v.synopsis,
-            cover_image_url: v.cover_image_url,
-            release_date: v.release_date
-                ? TimeUtil.formatTime(v.release_date, TIME_FORMAT.SHORT_DATE)
-                : '',
-            chapters: v.chapters.map((ch: any) => ({
-                id: ch.id,
-                title: ch.title,
-                index: ch.index,
-                updated_at: TimeUtil.formatTime(
-                    ch.updated_at,
-                    TIME_FORMAT.SHORT_DATE,
-                ),
-                word_count: ch.word_count,
-            })),
-        }));
+    constructor(
+        id: number,
+        title: string,
+        cover_image_url: string,
+        summary: EditorContent[],
+        author: AuthorOrArtist,
+        artist: AuthorOrArtist,
+        status: number,
+        genres: GenreResponse[],
+        type: number,
+        alternative_names: string[],
+        word_count: number,
+        volumes: VolumeSummaryResponse[],
+    ) {
+        this.id = id;
+        this.title = title;
+        this.cover_image_url = cover_image_url;
+        this.summary = summary;
+        this.author = author;
+        this.artist = artist;
+        this.status = status;
+        this.genres = genres;
+        this.type = type;
+        this.alternative_names = alternative_names;
+        this.word_count = word_count;
+        this.volumes = volumes;
+    }
+
+    static fromRawResponse(data: RawData) {
+        const author = new AuthorResponse(data.author_id, data.author_name);
+        const artist = new ArtistResponse(data.artist_id, data.artist_name);
+        const genres = data.genre_ids.map(
+            (id: number, index: number) =>
+                new GenreResponse(id, data.genre_names[index]),
+        );
+
+        return new BaseLightNovelResponse(
+            data.id,
+            data.title,
+            data.cover_image_url,
+            data.summary,
+            author,
+            artist,
+            data.status,
+            genres,
+            data.type,
+            data.alternative_names,
+            +data.word_count,
+            VolumeSummaryResponse.fromQueryBuilderGetNovelDetail(data.volumes),
+        );
     }
 }
