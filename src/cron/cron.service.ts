@@ -1,19 +1,22 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { RedisService } from '@syurodev/nestjs-common';
 import { TimeUtil } from '@syurodev/ts-common';
+import { Between, EntityManager } from 'typeorm';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { REDIS_KEY_PREFIX } from '../common/constants/redis-key.enum';
 import { HourViewRepository } from '../data/repositories/hour-view.repository';
 import { HourView } from '../data/entities/hour-view.entity';
-import { EntityManager } from 'typeorm';
 import { Chapter } from '../data/entities/chapter.entity';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { DailyViewRepository } from '../data/repositories/daily-view.repository';
+import { DailyView } from '../data/entities/daily-view.entity';
 
 @Injectable()
 export class CronService {
     constructor(
         private readonly redisService: RedisService,
         private readonly hourViewRepository: HourViewRepository,
+        private readonly dailyViewRepository: DailyViewRepository,
     ) {}
 
     @Cron(CronExpression.EVERY_HOUR)
@@ -78,6 +81,26 @@ export class CronService {
             });
     }
 
+    @Cron('59 23 * * *') //Chạy cuối ngày
+    async dailyViewedHandler() {
+        const date = new TimeUtil(new Date());
+        const hourViews: HourView[] = await this.hourViewRepository.find({
+            viewedAt: Between(date.getStartOfDayUnix(), date.getEndOfDayUnix()),
+        });
+
+        const aggregateViews = this.aggregateViewsByChapter(hourViews);
+
+        for (const x of aggregateViews) {
+            const dailyViewed: DailyView = new DailyView();
+            dailyViewed.novelId = x.novelId;
+            dailyViewed.chapterId = x.chapterId;
+            dailyViewed.views = x.views;
+            dailyViewed.viewedAt = date.getStartOfDayUnix();
+
+            await this.dailyViewRepository.save(dailyViewed);
+        }
+    }
+
     private processResults(
         results: any[],
         viewCounts: Map<
@@ -118,9 +141,6 @@ export class CronService {
                         viewCounts.get(key)!.views += count; // Cộng dồn số lượt xem
                     },
                 );
-            } else {
-                // result là một số hoặc kiểu dữ liệu không hợp lệ, xử lý riêng nếu cần
-                Logger.error('Unexpected result type:', result);
             }
         });
     }
@@ -171,5 +191,39 @@ export class CronService {
         } while (cursor !== '0');
 
         return keys;
+    }
+
+    aggregateViewsByChapter(data: HourView[]) {
+        const aggregated = new Map<
+            string,
+            Partial<{
+                novelId: number;
+                chapterId: number;
+                views: number;
+                viewedAt: number;
+            }>
+        >();
+
+        for (const item of data) {
+            const chapterKey = item.chapterId;
+
+            if (aggregated.has(chapterKey.toString())) {
+                const existing = aggregated.get(chapterKey.toString())!;
+
+                // Cộng dồn views
+                existing.views! += item.views;
+            } else {
+                // Nếu chưa tồn tại chapterId, thêm mới vào map, giữ novelId thay vì id
+                aggregated.set(chapterKey.toString(), {
+                    novelId: item.novelId,
+                    chapterId: item.chapterId,
+                    views: item.views,
+                    viewedAt: item.viewedAt,
+                });
+            }
+        }
+
+        // Trả về mảng các giá trị đã gộp
+        return Array.from(aggregated.values());
     }
 }

@@ -18,6 +18,12 @@ export class BaseRepository<T> {
         });
     }
 
+    async find(option: FindOptionsWhere<T>): Promise<T[]> {
+        return await this.repository.find({
+            where: option,
+        });
+    }
+
     async findAndCount(
         option: FindOptionsWhere<T>,
         page: number,

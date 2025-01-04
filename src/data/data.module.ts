@@ -27,6 +27,8 @@ import { Bookmark } from './entities/bookmark.entity';
 import { BookmarkRepository } from './repositories/bookmark.repository';
 import { HourViewRepository } from './repositories/hour-view.repository';
 import { HourView } from './entities/hour-view.entity';
+import { DailyViewRepository } from './repositories/daily-view.repository';
+import { DailyView } from './entities/daily-view.entity';
 
 @Global()
 @Module({
@@ -48,6 +50,7 @@ import { HourView } from './entities/hour-view.entity';
             ReadingHistory,
             Bookmark,
             HourView,
+            DailyView,
         ]),
     ],
     providers: [
@@ -63,6 +66,7 @@ import { HourView } from './entities/hour-view.entity';
         ReadingHistoryRepository,
         BookmarkRepository,
         HourViewRepository,
+        DailyViewRepository,
     ],
     exports: [
         ArtistRepository,
@@ -77,6 +81,7 @@ import { HourView } from './entities/hour-view.entity';
         ReadingHistoryRepository,
         BookmarkRepository,
         HourViewRepository,
+        DailyViewRepository,
     ],
 })
 export class DataModule {}
