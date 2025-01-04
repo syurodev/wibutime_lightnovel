@@ -21,6 +21,12 @@ import { LightnovelVolumeMapRepository } from './repositories/lightnovel-volume-
 import { VolumeRepository } from './repositories/volume.repository';
 import { VolumeChapterMapRepository } from './repositories/volume-chapter-map.repository';
 import { Favorite } from './entities/favorite.entity';
+import { ReadingHistoryRepository } from './repositories/reading_history.repository';
+import { ReadingHistory } from './entities/reading-history.entity';
+import { Bookmark } from './entities/bookmark.entity';
+import { BookmarkRepository } from './repositories/bookmark.repository';
+import { HourViewRepository } from './repositories/hour-view.repository';
+import { HourView } from './entities/hour-view.entity';
 
 @Global()
 @Module({
@@ -39,6 +45,9 @@ import { Favorite } from './entities/favorite.entity';
             Volume,
             VolumeChapterMap,
             Favorite,
+            ReadingHistory,
+            Bookmark,
+            HourView,
         ]),
     ],
     providers: [
@@ -51,6 +60,9 @@ import { Favorite } from './entities/favorite.entity';
         LightnovelVolumeMapRepository,
         VolumeRepository,
         VolumeChapterMapRepository,
+        ReadingHistoryRepository,
+        BookmarkRepository,
+        HourViewRepository,
     ],
     exports: [
         ArtistRepository,
@@ -62,6 +74,9 @@ import { Favorite } from './entities/favorite.entity';
         LightnovelVolumeMapRepository,
         VolumeRepository,
         VolumeChapterMapRepository,
+        ReadingHistoryRepository,
+        BookmarkRepository,
+        HourViewRepository,
     ],
 })
 export class DataModule {}

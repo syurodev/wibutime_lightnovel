@@ -49,4 +49,37 @@ export class BaseRepository<T> {
         const record = this.repository.create(data);
         return await manager.save(record);
     }
+
+    async saveAll(
+        data: DeepPartial<T>[],
+        entityManager?: EntityManager,
+    ): Promise<T[]> {
+        const manager: EntityManager = entityManager || this.repository.manager;
+
+        // Create the record using the repository
+        const record = this.repository.create(data);
+        return await manager.save(record);
+    }
+
+    async increment(
+        conditions: FindOptionsWhere<T>,
+        propertyPath: string,
+        value: number | string,
+        entityManager?: EntityManager,
+    ) {
+        const manager: EntityManager = entityManager || this.repository.manager;
+
+        // Nếu entityManager được cung cấp, sử dụng nó để chạy trong transaction
+        if (entityManager) {
+            await entityManager.increment(
+                this.repository.target, // Target là tên entity hoặc class
+                conditions,
+                propertyPath,
+                value,
+            );
+        } else {
+            // Nếu không có transaction, sử dụng manager mặc định
+            await this.repository.increment(conditions, propertyPath, value);
+        }
+    }
 }

@@ -11,6 +11,8 @@ import { VolumeChapterMapModule } from './volume-chapter-map/volume-chapter-map.
 import { LightnovelVolumeMapModule } from './lightnovel-volume-map/lightnovel-volume-map.module';
 import { LightnovelGenreMapModule } from './lightnovel-genre-map/lightnovel-genre-map.module';
 import { VERSION_CONTROLLER_ENUM } from '../common/constants/version-controller.enum';
+import { ReadingHistoryModule } from './reading-history/reading-history.module';
+import { BookmarkModule } from './bookmark/bookmark.module';
 
 const routes: Routes = [
     {
@@ -26,6 +28,8 @@ const routes: Routes = [
             VolumeChapterMapModule,
             LightnovelVolumeMapModule,
             LightnovelGenreMapModule,
+            ReadingHistoryModule,
+            BookmarkModule,
         ],
     },
 ];
@@ -42,6 +46,8 @@ const routes: Routes = [
         VolumeChapterMapModule,
         LightnovelVolumeMapModule,
         LightnovelGenreMapModule,
+        ReadingHistoryModule,
+        BookmarkModule,
     ],
     controllers: [],
     providers: [],

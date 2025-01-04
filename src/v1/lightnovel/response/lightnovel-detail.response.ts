@@ -3,6 +3,7 @@ import { EditorContent } from '../../../common/interfaces/editor';
 import { AuthorResponse } from '../../author/response/response';
 import { ArtistResponse } from '../../artist/response/response';
 import { GenreResponse } from '../../genre/response/response';
+import { BasicUserDataResponse } from '../../../grpc/client/protos/interfaces/user';
 import { VolumeSummaryResponse } from '../../volume/response/volume-summary.response';
 
 type RawData = {
@@ -42,6 +43,7 @@ export class BaseLightNovelResponse {
     alternative_names: string[];
     word_count: number;
     volumes: VolumeSummaryResponse[];
+    user: BasicUserDataResponse;
 
     constructor(
         id: number,
@@ -69,6 +71,11 @@ export class BaseLightNovelResponse {
         this.alternative_names = alternative_names;
         this.word_count = word_count;
         this.volumes = volumes;
+        this.user = {
+            id: 1,
+            nick_name: 'Syuro',
+            avatar: '',
+        };
     }
 
     static fromRawResponse(data: RawData) {
