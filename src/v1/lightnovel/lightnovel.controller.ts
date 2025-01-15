@@ -4,11 +4,33 @@ import { BaseResponse } from '@syurodev/nestjs-common';
 import { LightnovelService } from './lightnovel.service';
 import { LightnovelSummaryResponse } from './response/lightnovel-summary.response';
 import { BaseLightNovelResponse } from './response/lightnovel-detail.response';
+import { TOP_TYPE } from '../../common/constants/top-type.enum';
 
 @Controller('novels')
 // @UseFilters(new AllExceptionsFilter())
 export class LightnovelController {
     constructor(private readonly lightnovelService: LightnovelService) {}
+
+    @Get('/top')
+    async getTop(
+        @Query()
+        query: {
+            limit: number;
+            type: TOP_TYPE;
+        },
+        @Res() res: Response,
+    ) {
+        const response: BaseResponse<any> = new BaseResponse<any>();
+
+        const result = await this.lightnovelService.getTop(
+            query.type,
+            query.limit,
+        );
+
+        return res
+            .status(HttpStatus.OK)
+            .send(LightnovelSummaryResponse.fromRawResponse(result));
+    }
 
     @Get('/:id/summary')
     async getSummary(@Param('id') id: number, @Res() res: Response) {

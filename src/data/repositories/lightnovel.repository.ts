@@ -115,16 +115,6 @@ export class LightnovelRepository extends BaseRepository<Lightnovel> {
         page: number;
         limit: number;
     }) {
-        console.log({
-            user_id,
-            author_id,
-            artist_id,
-            status,
-            type,
-            key_search,
-            page,
-            limit,
-        });
         const queryBuilder = this.lightnovelRepository
             .createQueryBuilder('ln')
             .leftJoin('authors', 'author', 'author.id = ln.author')
@@ -181,5 +171,65 @@ export class LightnovelRepository extends BaseRepository<Lightnovel> {
             limit,
             totalPages: Math.ceil(total / limit),
         };
+    }
+
+    async getTop(type: number, limit: number) {
+        let viewTable = '';
+
+        // Xác định bảng views cần sử dụng
+        switch (+type) {
+            case 1:
+                viewTable = 'daily_views';
+                break;
+            case 2:
+                viewTable = 'weekly_views';
+                break;
+            case 3:
+                viewTable = 'monthly_views';
+                break;
+            case 4:
+                viewTable = 'yearly_views';
+                break;
+            case 5:
+                viewTable = 'chapters'; // Dữ liệu tổng cho tất cả thời gian
+                break;
+            default:
+                throw new Error('Invalid top_type');
+        }
+
+        const query = this.lightnovelRepository
+            .createQueryBuilder('ln')
+            .leftJoin(
+                (subQuery) => {
+                    return subQuery
+                        .select('view.novel_id', 'novel_id')
+                        .addSelect('SUM(view.views)', 'views')
+                        .from(viewTable, 'view')
+                        .groupBy('view.novel_id');
+                },
+                'view',
+                'view.novel_id = ln.id',
+            )
+            .leftJoin('authors', 'author', 'author.id = ln.author')
+            .leftJoin('artists', 'artist', 'artist.id = ln.artist')
+            .leftJoin('lightnovel_genre_maps', 'map', 'map.novel_id = ln.id')
+            .leftJoin('genres', 'genre', 'genre.id = map.genre_id')
+            .select([
+                'ln.id AS id',
+                'ln.title AS title',
+                'ln.cover_image_url AS cover_image_url',
+                'author.id AS author_id',
+                'author.name AS author_name',
+                'artist.id AS artist_id',
+                'artist.name AS artist_name',
+                'array_agg(DISTINCT genre.id) AS genre_ids',
+                'array_agg(DISTINCT genre.name) AS genre_names',
+                'COALESCE(view.views, 0) AS views', // Đổi tên trong select
+            ])
+            .groupBy('ln.id, author.id, artist.id, view.views') // Group theo các trường cần thiết
+            .orderBy('views', 'DESC') // Sắp xếp theo tổng lượt xem
+            .limit(limit); // Giới hạn kết quả
+
+        return await query.getRawMany();
     }
 }

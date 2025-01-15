@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { RedisClientModule } from '@syurodev/nestjs-common';
-
-import { GrpcModule } from './grpc/client/grpc.module';
 import { DataModule } from './data/data.module';
 import { AppV1Module } from './v1/app.v1.module';
 import { PublicModule } from './public/public.module';
@@ -14,7 +12,7 @@ import { CronModule } from './cron/cron.module';
             envFilePath: '.env',
             isGlobal: true,
         }),
-        GrpcModule,
+        // GrpcModule,
         DataModule,
         RedisClientModule.forRoot({
             host: process.env.CONFIG_REDIS_HOST,

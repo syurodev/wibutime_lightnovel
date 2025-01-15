@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
 import { LightnovelRepository } from '../../data/repositories/lightnovel.repository';
-import { UserGRPCService } from 'src/grpc/client/service/user.service';
 import { Lightnovel } from '../../data/entities/lightnovel.entity';
 import { FindOptionsWhere } from 'typeorm';
 
 @Injectable()
 export class LightnovelService {
-    constructor(
-        private readonly lightnovelRepository: LightnovelRepository,
-        private readonly userGRPCService: UserGRPCService,
-    ) {}
+    constructor(private readonly lightnovelRepository: LightnovelRepository) {}
 
     async findOne(option: FindOptionsWhere<Lightnovel>): Promise<Lightnovel> {
         return await this.lightnovelRepository.findOne(option);
@@ -53,5 +49,9 @@ export class LightnovelService {
             page,
             limit,
         });
+    }
+
+    async getTop(type: number, limit: number) {
+        return await this.lightnovelRepository.getTop(type, limit);
     }
 }

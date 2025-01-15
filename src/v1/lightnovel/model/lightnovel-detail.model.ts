@@ -1,5 +1,4 @@
 import { EditorContent } from '../../../common/interfaces/editor';
-import { BasicUserDataResponse } from '../../../grpc/client/protos/interfaces/user';
 
 export type AuthorOrArtist = {
     id: number;
@@ -32,7 +31,7 @@ export type Volume = {
 export class LightNovelModel {
     id: number;
     title: string;
-    user: BasicUserDataResponse;
+    user: any;
     cover_image_url: string;
     views: number;
     followers: number;
@@ -46,7 +45,7 @@ export class LightNovelModel {
     word_count: number;
     volumes: Volume[];
 
-    constructor(data: any, user: BasicUserDataResponse) {
+    constructor(data: any, user: any) {
         this.id = data.id;
         this.title = data.title;
         this.user = user;

@@ -12,8 +12,8 @@ export class Chapter extends TypeOrmBaseEntity {
     @Column({ name: 'volume_id', type: 'int', default: 0 })
     volume_id: number;
 
-    @Column({ name: 'viewed', type: 'bigint', default: 0 })
-    viewed: number;
+    @Column({ name: 'views', type: 'bigint', default: 0 })
+    views: number;
 
     @Column({ type: 'varchar' })
     title: string;

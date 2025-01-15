@@ -8,8 +8,8 @@ import { DailyView } from '../entities/daily-view.entity';
 export class DailyViewRepository extends BaseRepository<DailyView> {
     constructor(
         @InjectRepository(DailyView)
-        private readonly hourViewRepository: Repository<DailyView>,
+        private readonly dailyViewRepository: Repository<DailyView>,
     ) {
-        super(hourViewRepository);
+        super(dailyViewRepository);
     }
 }
