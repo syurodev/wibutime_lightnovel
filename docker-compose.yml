@@ -1,93 +1,26 @@
-version: '3'
+version: '3.8'
+
 services:
-  mongo-1:
-    container_name: 'mongo-1-container'
-    entrypoint: >
-      /bin/bash -c '
-      openssl rand -base64 756 > /data/keyfile.key &&
-      chmod 400 /data/keyfile.key &&
-      chown mongodb:mongodb /data/keyfile.key &&
-      /usr/local/bin/docker-entrypoint.sh mongod --replSet rs0 --keyFile /data/keyfile.key --bind_ip_all'
-    image: 'mongo:7.0.0'
+  redis:
+    image: redis:alpine  # Using alpine for smaller image size
+    command: redis-server --requirepass eeba8b1e4fdc1b42a2acb68b51cb2c00 --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
     ports:
-      - 27017:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin
-      - MONGO_INITDB_DATABASE=lightnovel
+      - "6379:6379"
     volumes:
-      - 'mongo1data:/data/db'
-      - 'mongo1config:/data/configdb'
-      - 'sharedconfig:/data'
-    healthcheck:
-      test: mongosh
-        -u $${MONGO_INITDB_ROOT_USERNAME}
-        -p $${MONGO_INITDB_ROOT_PASSWORD}
-        --eval "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongo-1:27017',priority:1},{_id:1,host:'mongo-2:27017',priority:0.5},{_id:2,host:'mongo-3:27017',priority:0.5}]}) }" | mongosh --port 27017 --quiet
-      interval: 5s
-      timeout: 30s
-      start_period: 0s
-      start_interval: 1s
-      retries: 30
-    networks:
-      - 'mongo_network'
+      - redis_data:/data
     restart: unless-stopped
-
-  mongo-2:
-    container_name: 'mongo-2-container'
-    image: 'mongo:7.0.0'
-    ports:
-      - 27018:27017
-    volumes:
-      - 'mongo2data:/data/db'
-      - 'mongo2config:/data/configdb'
-      - 'sharedconfig:/data'
-    command:
-      [
-        '--replSet',
-        'rs0',
-        '--bind_ip_all',
-        '--port',
-        '27017',
-        '--keyFile',
-        '/data/keyfile.key',
-      ]
     networks:
-      - 'mongo_network'
-    restart: unless-stopped
-
-  mongo-3:
-    container_name: 'mongo-3-container'
-    image: 'mongo:7.0.0'
-    ports:
-      - 27019:27017
-    volumes:
-      - 'mongo3data:/data/db'
-      - 'mongo3config:/data/configdb'
-      - 'sharedconfig:/data'
-    command:
-      [
-        '--replSet',
-        'rs0',
-        '--bind_ip_all',
-        '--port',
-        '27017',
-        '--keyFile',
-        '/data/keyfile.key',
-      ]
-    networks:
-      - 'mongo_network'
-    restart: unless-stopped
-
-volumes:
-  mongo1data:
-  mongo1config:
-  mongo2data:
-  mongo2config:
-  mongo3data:
-  mongo3config:
-  sharedconfig:
+      - redis_network
+    sysctls:
+      net.core.somaxconn: 1024
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
 
 networks:
-  mongo_network:
+  redis_network:
     driver: bridge
+
+volumes:
+  redis_data:

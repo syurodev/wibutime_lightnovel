@@ -1,11 +1,12 @@
 import { TimeUtil } from '@syurodev/ts-common';
 import { CONTENT_TYPE } from 'src/common/constants/content-type.enum';
+import { EditorContent } from 'src/common/interfaces/editor';
 import { GenerateUrl } from 'src/common/utils/generate-url.util';
-import { ArtistResponse } from '../../artist/response/response';
-import { AuthorResponse } from '../../author/response/response';
-import { GenreResponse } from '../../genre/response/response';
+import { ArtistResponse } from 'src/v1/artist/response/response';
+import { AuthorResponse } from 'src/v1/author/response/response';
+import { GenreResponse } from 'src/v1/genre/response/response';
 
-export class LightnovelSummaryResponse {
+export class TopNovelResponse {
   id: number;
   type: CONTENT_TYPE;
   title: string;
@@ -17,6 +18,7 @@ export class LightnovelSummaryResponse {
   author: AuthorResponse;
   artist: ArtistResponse;
   genres: GenreResponse[];
+  summary: EditorContent[];
   content: {
     id: number;
     index: number;
@@ -43,6 +45,7 @@ export class LightnovelSummaryResponse {
       ? new TimeUtil(init.latest_chapter_date).convertToClientDate()
       : '';
     this.views = init?.views ?? 0;
+    this.summary = init?.summary ? init.summary : [];
     this.content = init?.latest_chapter?.id
       ? {
           id: init.latest_chapter.id,
@@ -55,15 +58,13 @@ export class LightnovelSummaryResponse {
       : null;
   }
 
-  static fromRawResponse(
-    response: any,
-  ): LightnovelSummaryResponse | LightnovelSummaryResponse[] {
+  static fromRawResponse(response: any): TopNovelResponse | TopNovelResponse[] {
     if (Array.isArray(response)) {
       return response.map((x) => {
-        return new LightnovelSummaryResponse(x);
+        return new TopNovelResponse(x);
       });
     } else {
-      return new LightnovelSummaryResponse(response);
+      return new TopNovelResponse(response);
     }
   }
 }

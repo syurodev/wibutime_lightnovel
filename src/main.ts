@@ -1,4 +1,6 @@
 import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { NestFactory } from '@nestjs/core';
 import {
     FastifyAdapter,
@@ -14,7 +16,6 @@ import { grpcServerOptions } from './grpc/server/server.config';
 import { swaggerConfig } from './config/swagger.config';
 import * as fs from 'fs';
 
-dotenv.config();
 const envConfig = dotenv.parse(fs.readFileSync('.env'));
 
 const SERVICE_NAME: string = process.env.npm_package_name;

@@ -1,13 +1,11 @@
 export class GenerateUrl {
-    resource_id: string;
-    image_name: string;
+  url: string;
 
-    constructor(resourceId: string, imageName: string) {
-        this.resource_id = resourceId;
-        this.image_name = imageName;
-    }
+  constructor(url: string) {
+    this.url = url;
+  }
 
-    getNovelUrl() {
-        return `ln/${this.resource_id}/${this.image_name}`;
-    }
+  getMediaUrl() {
+    return `${process.env.MEDIA_SERVER_ENDPOINT ?? 'localhost:9000'}${this.url}`;
+  }
 }

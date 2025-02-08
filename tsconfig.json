@@ -16,6 +16,13 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@interfaces/*": ["src/common/interfaces/*"],
+      "@constants/*": ["src/common/constants/*"],
+      "@utils/*": ["src/common/utils/*"],
+      "@entities/*": ["src/data/entities/*"],
+      "@repositories/*": ["src/data/repositories/*"]
+    }
   }
 }
